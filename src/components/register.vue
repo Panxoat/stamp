@@ -272,7 +272,7 @@ SitSeeGSM.com
               code: this.code
             })
               .then((response) => {
-                console.log("res data")
+                // console.log("res data")
                 if(response.data){
                   this.$swal({
                     icon: 'success',
@@ -284,7 +284,7 @@ SitSeeGSM.com
                 }
               })
               .catch((e) => {
-                console.log("error data")
+                // console.log("error data")
                 if(e.response) {
                   if(e.response.data.explain === 'Incorrect Code') {
                     this.$swal({
@@ -305,20 +305,23 @@ SitSeeGSM.com
             axios.post('/auth/signup',
             { 
               email: `${this.email}@gsm.hs.kr`,
-              pw: this.password,
-              pwc: this.passwordcheck,
+              code : parseInt(this.code),
+              pw: this.pw,
+              pwc: this.pwc,
               grade: this.grade,
               classno: this.classno,
               number: this.number,
-              phone: this.phone,
-              gender: this.gender,
+              phone: this.phone.toString(),
+              gender: parseInt(this.gender),
               name: this.name
             })
               .then((response) => {
                 alert("회원가입")
+                this.$router.push({name: 'login'})
             })
               .catch((e) => {
                 if(e.response) {
+                  // console.log(e.response.data)
                   if(e.response.data.explain === 'joi error') {
                     this.$swal({
                       icon: 'error',

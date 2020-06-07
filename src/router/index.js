@@ -4,28 +4,24 @@ import register from '../components/register.vue'
 import login from '../components/login.vue'
 import main from '../components/main.vue'
 import reserve from '../components/reserve.vue'
-import Notice from '../components/Notice.vue'
-import store from '../store'
+import { store } from '../store'
 
 Vue.use(VueRouter)
 
 const isAuthenticated = (to, from, next) => {
-  console.log("router", store.state.isLogin)
-  if(store.state.isLogin === false) {
-    alert("로그인 X")
+  if(store.state.auth.token === null) {
+    alert("로그인을 해주세요.")
     next('/login')
   } else {
-    alert("로그인 O")
     next()
   }
 }
 
 const onlyAuthenticated = (to, from, next) => {
-  if(store.state.isLogin === true) {
-    // alert("이미 로그인을 함")
+  if(store.state.auth.token !=undefined) {
+    alert("이미 로그인 되어있습니다.")
     next('/reserve')
   } else {
-    // alert("로그인 안함")
     next()
   }
 }
@@ -45,18 +41,14 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: register
+    component: register,
+    beforeEnter: onlyAuthenticated
   },
   {
     path: '/login',
     name: 'login',
     component: login,
     beforeEnter: onlyAuthenticated
-  },
-  {
-    path: '/notice',
-    name: 'Notice',
-    component: Notice
   },
   {
     path: '/about',

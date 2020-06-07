@@ -2,8 +2,8 @@ import axios from 'axios'
 import { router } from '../../router/index.js'
 
 const state = {
-    name: null,
-    isLogin: false,
+    userInfo: null,
+    token: localStorage.getItem('token')
 }
 
 const getters = {
@@ -13,14 +13,15 @@ const getters = {
 const mutations = {
     login(state, token) {
         localStorage.setItem('token', token)
-        state.isLogin = true
+        state.token = token
     },
     getUserInfo(state, payload) {
         state.userInfo = payload
-        console.log("state", state.userInfo)
+        // console.log("stateName", state.userInfo)
     },
     logout(state) {
         state.token = null
+        localStorage.removeItem('token')
     }
 }
 
@@ -44,19 +45,22 @@ const actions = {
                 token : getToken
             }
         }).then((response) => {
-            // let userInfo = {
-            //     user_name : response.data.name,
-            //     user_grade : response.data.grade
-            // }
+            let userInfo = {
+                user_name : response.data.name,
+                user_grade : response.data.grade
+            }
             // console.log(userInfo)
             commit('login', getToken)
-            commit('getUserInfo', response.data.name)
+            commit('getUserInfo', userInfo)
+
+            // console.log('AfterCommit', userInfo)
         }).catch((e) => {
-            console.log(e)
+            // console.log(e)
         })
     },
     logout({commit}) {
         commit('logout')
+        router.push({name: "login"})
     }
 }
 

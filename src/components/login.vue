@@ -85,7 +85,7 @@ SitSeeGSM.com
     }),
 
     computed: {
-      ...mapState(["islogin"])
+
     },
     
     methods: {
@@ -94,14 +94,14 @@ SitSeeGSM.com
           if(valid) {
             let id = `${this.auth_id}@gsm.hs.kr`
             let pw = this.auth_pw
-            console.log("submit", id, pw)
-            this.$store.dispatch('login', {auth_id: id, auth_pw: pw})
+            // console.log("submit", id, pw)
+            this.$store.dispatch('auth/login', {auth_id: id, auth_pw: pw})
               .then(() => {
-                console.log("success")
+                // console.log("success")
               })
               .catch((e) => {
                 if(e.response) {
-                    console.log(e.response.data)
+                    // console.log(e.response.data)
                   if(e.response.data.explain === 'Incorrect') {
                     this.$swal({
                       icon: 'error',
