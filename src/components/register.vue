@@ -272,7 +272,6 @@ SitSeeGSM.com
               code: this.code
             })
               .then((response) => {
-                // console.log("res data")
                 if(response.data){
                   this.$swal({
                     icon: 'success',
@@ -284,7 +283,6 @@ SitSeeGSM.com
                 }
               })
               .catch((e) => {
-                // console.log("error data")
                 if(e.response) {
                   if(e.response.data.explain === 'Incorrect Code') {
                     this.$swal({

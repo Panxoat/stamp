@@ -118,38 +118,7 @@
             <div class="font-weight-black title black--text ma-2" align="center">
                 공지사항이 없습니다.
             </div>
-            <!-- <v-row
-                align="center"
-                justify="center"
-                class="mb-10">
-                <v-col md="4" cols="12">
-                    <v-card hover class="ma-2">
-                        <v-card-text>
-                            <tbody>
-                                <tr>
-                                    <td class="td_section"><v-chip label color="red" dark>공지</v-chip></td>
-                                    <td class="td_title font-weight-black">기숙사 입소시간 안내</td>
-                                    <td class="td_writer">모훈</td>
-                                    <td class="td_time">2:08</td>
-                                </tr>
-                            </tbody>
-                        </v-card-text>
-                    </v-card>
-                    <v-card hover class="ma-2">
-                        <v-card-text>
-                            <tbody>
-                                <tr>
-                                    <td class="td_section"><v-chip label color="red" dark>공지</v-chip></td>
-                                    <td class="td_title font-weight-black">기숙사 내 주의사항 안내</td>
-                                    <td class="td_writer">박건은</td>
-                                    <td class="td_time">13:02</td>
-                                </tr>
-                            </tbody>
-                        </v-card-text>
-                    </v-card>                                        
-                </v-col>
-            </v-row> -->
-            
+            <!-- 공지사항 content -->
             <v-divider/>
 
             <v-row>
@@ -161,7 +130,6 @@
                 align="center"
                 justify="center"
                 class="mb-10">
-                <!-- <div v-if="closeTicket == false"> -->
                 <v-sheet
                     class="mx-auto"
                     max-width="90%">
@@ -268,13 +236,11 @@ components: {
         }
     }).then((response) => {
         let resTicket = response.data.ticket
-        // console.log(resTicket.length)
         for(let i = 0; i<resTicket.length; i++) {
             if(resTicket[i] !== '') {
                 this.tickets.push(resTicket[i])
             }
         }
-        // console.log("tickets", this.tickets)
     })
 
     axios.post('/ticket/status', {
@@ -287,7 +253,6 @@ components: {
                     this.reservations.push(statusTicket[i])
                 }
             }
-            // console.log("statusTicket", this.reservations)
         })
     
  },
@@ -303,7 +268,6 @@ components: {
      
      buyTicket(ticketLink) {
          let getToken = localStorage.getItem('token')
-        //  console.log("tl", ticketLink)
          axios.post('/ticket/purchase', {
              token: getToken,
              link: ticketLink
@@ -313,11 +277,12 @@ components: {
                     icon: 'success',
                     title: '좋아요!',
                     text: '티켓이 성공적으로 신청되었습니다.'
-                })                
-                // console.log(response)
+                })
+                setTimeout(() => {
+                    this.$router.go()
+                },1000)
             })
             .catch((e) => {
-                // console.log(e.response.data)
                 if(e.response.data.explain === 'Ticket Who') {
                     this.$swal({
                       icon: 'error',
@@ -358,7 +323,12 @@ components: {
              token: getToken
          })
             .then((response) => {
-                // console.log(response.data)
+                if(response.data) {
+                    this.$router.go() // redirect
+                }
+            })
+            .catch((e) => {
+                alert("오류", e.response.data)
             })
      }
  },
