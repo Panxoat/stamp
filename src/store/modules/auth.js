@@ -60,7 +60,7 @@ const actions = {
     },
     logout({commit}) {
         commit('logout')
-        router.push({name: "login"})
+        router.push({name: "main"})
     }
 }
 

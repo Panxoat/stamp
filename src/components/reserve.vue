@@ -16,7 +16,8 @@
             <v-list-item>
                 <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">티켓 코드</v-list-item-content>                                
                 <v-list-item-content>{{staTicket.code}}</v-list-item-content>
-            </v-list-item>            
+            </v-list-item>
+            <v-divider></v-divider>
         </div>
     </v-list>
     </v-navigation-drawer>
@@ -31,7 +32,7 @@
         <v-toolbar-title v-else>잘못된 접근</v-toolbar-title>
         
         <v-spacer></v-spacer>
-        <v-dialog v-model="createDialog" persistent max-width="500">
+        <v-dialog v-model="createDialog" max-width="500">
             <template v-slot:activator="{ on }">
                 <v-btn v-if="user['user_grade']==100" class="ma-4" color="indigo lighten-1" v-on="on">티켓 생성</v-btn>
             </template>
@@ -167,7 +168,7 @@
                     max-width="90%">
                 <v-slide-group show-arrows>
                     <v-slide-item v-for="(cdx, i) in tickets" :key="i">
-                            <v-card class="ma-4" width="250">
+                            <v-card class="ma-4" width="270">
                                 <v-list dense>
                                     <v-card-title class="subheading font-weight-bold">{{cdx.title}}</v-card-title>
                                     <v-divider></v-divider>
@@ -185,7 +186,7 @@
                                     </v-list-item>
                                     <v-list-item>
                                         <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">신청 대상</v-list-item-content>
-                                        <v-list-item-content>{{cdx.who / 100}}학년{{cdx.who / 10 % 10 == 0 ? "전체" : cdx.who / 10 % 10 == 1 ? "남학생" : "여학생"}}</v-list-item-content>
+                                        <v-list-item-content>{{parseInt(cdx.who / 100) == 0 ? "전체" : parseInt(cdx.who / 100)}}학년{{cdx.who / 10 % 10 == 0 ? "전체" : cdx.who / 10 % 10 == 1 ? "남학생" : "여학생"}}</v-list-item-content>
                                     </v-list-item>
                                     <v-list-item>
                                         <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">열린 시간</v-list-item-content>
@@ -313,7 +314,10 @@ components: {
                     icon: 'success',
                     title: '좋아요!',
                     text: '티켓이 성공적으로 신청되었습니다.'
-                })                
+                })
+                setTimeout(() => {
+                    this.$router.go()
+                },1000)
                 // console.log(response)
             })
             .catch((e) => {
@@ -329,7 +333,7 @@ components: {
                       icon: 'error',
                       title: '이런!',
                       text: '이미 신청한 티켓입니다'
-                    })                    
+                    })             
                 }
             })
      },
@@ -358,7 +362,13 @@ components: {
              token: getToken
          })
             .then((response) => {
-                // console.log(response.data)
+                if(response.data) {
+                    this.$router.go() // redirect
+                }
+            })
+            .catch((e) => {
+                // console.log(e.response.data)
+                alert("오류", e.response.data)
             })
      }
  },

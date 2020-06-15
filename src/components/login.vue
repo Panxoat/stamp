@@ -30,6 +30,7 @@
                         :error-messages="errors"
                         label="비밀번호"
                         type="password"
+                        v-on:keyup.enter="submit"
                         required
                         outlined
                         ></v-text-field>
@@ -47,13 +48,10 @@
         </v-row>        
       </v-container>
     </v-content>
-        <v-footer padless absolute>
+       <v-footer padless absolute>
       <v-col
         class="py-2 text-center caption">
-벌점왕HS.com
- - SitSeeGSM.com 으로 자동 연결
-SitSeeGSM.com
- - CloudWatch NameServer를 통해 현재 AWS 서버 연결 예정
+스탬프.com - <a href='https://mo-hun.github.io/StampText/TermOfService'>이용약관</a> / <a href="https://mo-hun.github.io/StampText/PrivacyStatement">개인정보취급방침</a>
       </v-col>
     </v-footer>
   </v-app>

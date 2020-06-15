@@ -40,6 +40,9 @@ export default {
             
         }
     },
+    created () {
+      localStorage.removeItem('token');
+    },
 
     methods: {
         routePage(pathName){
