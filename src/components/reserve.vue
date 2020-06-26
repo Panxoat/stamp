@@ -6,18 +6,15 @@
         >
 
     <v-list dense>
-        <v-card-title class="subheading font-weight-bold">{{user['user_name']}}님 - 신청한 티켓</v-card-title>
+        <v-card-title class="subheading font-weight-bold">{{user['user_name']}}님이 신청한티켓</v-card-title>
         <v-divider></v-divider>
-        <div v-for="(staTicket, i) in reservations" :key="i" >
-            <v-list-item>
-                <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">티켓 이름</v-list-item-content>
-                <v-list-item-content>{{staTicket.ticketname}}</v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-                <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">티켓 코드</v-list-item-content>                                
-                <v-list-item-content>{{staTicket.code}}</v-list-item-content>
-            </v-list-item>
-            <v-divider></v-divider>
+        <div>
+            <v-card-text class="">신청내역 조회가 이동되었습니다.
+                <v-btn color="indigo" dark block @click="snackbar = true">
+                    <v-icon>arrow_forward</v-icon>
+                </v-btn>
+            
+            </v-card-text>
         </div>
     </v-list>
     </v-navigation-drawer>
@@ -106,11 +103,49 @@
                 </v-card-text>
             </v-card>           
         </v-dialog>
+        <v-bottom-sheet v-model="sheet" max-width="60%">
+            <template v-slot:activator="{ on, attrs}">
+                <v-btn color="white--text" v-bind="attrs" v-on="on" text>신청내역</v-btn>
+            </template>
+            <v-sheet class="text-center" height="500px">
+                <v-card flat>
+                    <v-card-title class="font-weight-bold">
+                        {{user['user_name']}}님 티켓 신청내역 ({{today}}기준)
+                    </v-card-title>
+                    <v-card-text>
+                        <v-data-table
+                            :headers="headers"
+                            :items="reservations"
+                            :items-per-page="itemsPerPage"
+                            :page.sync="page"
+                            hide-default-footer
+                            >
+                            <template v-slot:item.cancelTicket="{ item }">
+                                <v-btn small color="indigo" dark @click="cancel(item.code)">취소</v-btn>
+                            </template>
+                        </v-data-table>
+                        <v-pagination v-model="page" :length="pageCount" color="indigo"></v-pagination>
+                    </v-card-text>
+                </v-card>
+                <div class="font-weight-black title indigo--text text--lighten-1" align="center">v1.2.1-release2</div>
+            </v-sheet>
+        </v-bottom-sheet>
 
-        <v-btn color="indigo lighten-1 white--text" @click="logOut">로그아웃</v-btn>
+        <v-btn color="white--text" @click="logOut" text>로그아웃</v-btn>
+
         </v-app-bar>
 
         <v-content>
+            <v-snackbar
+                class="mt-10 ml-10"
+                v-model="snackbar"
+                :timeout="timeout"
+                auto-height
+                top
+                right
+            >
+                {{text}}
+            </v-snackbar>
             <v-row>
                 <v-col>
                     <div class="font-weight-black headline indigo--text text--lighten-1 my-3" align="center">공지사항</div>
@@ -166,7 +201,7 @@
                 <v-sheet
                     class="mx-auto"
                     max-width="90%">
-                <v-slide-group show-arrows>
+                <v-slide-group v-if="tickets != ''" show-arrows>
                     <v-slide-item v-for="(cdx, i) in tickets" :key="i">
                             <v-card class="ma-4" width="270">
                                 <v-list dense>
@@ -219,6 +254,9 @@
                             </v-card>
                     </v-slide-item>
                 </v-slide-group>
+                    <div v-else class="font-weight-black title black--text ma-2" align="center">
+                        티켓이 없습니다.
+                    </div>                
                 </v-sheet>
             </v-row>          
         </v-content>
@@ -239,7 +277,14 @@ components: {
  
  data () {
      return {
+        page: 1,
+        pageCount: '',
+        itemsPerPage: 5,
+        snackbar: false,
+        timeout: 3000,
+        text: '여기로 이동되었습니다!',
         drawer: null,
+        sheet: false,
         createDialog: false,
         infoDialog: false,
         tickets : [],
@@ -255,6 +300,16 @@ components: {
         postTicketClose: '',
         postTicketWho: '',
         ticketInfo: [],
+        headers: [
+            {
+                text: '티켓번호',
+                align: 'start',
+                value: 'code'
+            },
+            { text: '티켓생성일', value: 'createdAt'},
+            { text: '티켓이름', value: 'ticketname'},
+            { text: '티켓취소', value: 'cancelTicket'}
+        ],
      }
  },
 
@@ -286,8 +341,20 @@ components: {
             for(let i = 0; i<statusTicket.length; i++) {
                 if(statusTicket[i] !== '') {
                     this.reservations.push(statusTicket[i])
+                    this.reservations[i].createdAt = 
+                    `${this.reservations[i].createdAt.split(' ')[0].split('-')[0]}년
+                    ${this.reservations[i].createdAt.split(' ')[0].split('-')[1]}월
+                    ${this.reservations[i].createdAt.split(' ')[0].split('-')[2]}일`
                 }
             }
+            let date = new Date()
+            let week = new Array('일', '월', '화', '수', '목', '금', '토')
+            let curMonth = date.getMonth()
+            let curdate = date.getDate()
+            let curday = date.getDay()            
+            this.today = `${curMonth+1}월 ${curdate}일 ${week[curday]}요일`
+            let created = this.reservations[0].createdAt
+            this.pageCount = Math.ceil(this.reservations.length / this.itemsPerPage)
             
         })
     
@@ -367,9 +434,12 @@ components: {
                 }
             })
             .catch((e) => {
-                
                 alert("오류", e.response.data)
             })
+     },
+     
+     cancel(code) {
+         console.log(code)
      }
  },
 
