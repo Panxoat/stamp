@@ -17,7 +17,7 @@ const mutations = {
     },
     getUserInfo(state, payload) {
         state.userInfo = payload
-        // console.log("stateName", state.userInfo)
+        
     },
     logout(state) {
         state.token = null
@@ -49,13 +49,11 @@ const actions = {
                 user_name : response.data.name,
                 user_grade : response.data.grade
             }
-            // console.log(userInfo)
+
             commit('login', getToken)
             commit('getUserInfo', userInfo)
 
-            // console.log('AfterCommit', userInfo)
         }).catch((e) => {
-            // console.log(e)
         })
     },
     logout({commit}) {

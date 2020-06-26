@@ -92,14 +92,14 @@
           if(valid) {
             let id = `${this.auth_id}@gsm.hs.kr`
             let pw = this.auth_pw
-            // console.log("submit", id, pw)
+            
             this.$store.dispatch('auth/login', {auth_id: id, auth_pw: pw})
               .then(() => {
-                // console.log("success")
+                
               })
               .catch((e) => {
                 if(e.response) {
-                    // console.log(e.response.data)
+                    
                   if(e.response.data.explain === 'Incorrect') {
                     this.$swal({
                       icon: 'error',
@@ -111,29 +111,6 @@
             })            
           }
         })
-        // this.$refs.observer.validate().then(valid => {
-        //   if (valid) {
-        //     axios.post('/auth/signin',
-        //     {
-        //       auth_id : `${this.auth_id}@gsm.hs.kr`,
-        //       auth_pw : this.auth_pw
-        //     })
-        //       .then((response) => {
-        //         console.log(response.data)
-        //     })
-        //       .catch((e) => {
-        //         if(e.response) {
-        //           if(e.response.data.explain === 'Incorrect') {
-        //             this.$swal({
-        //               icon: 'error',
-        //               title: '이런!',
-        //               text: '로그인 또는 비밀번호가 틀렸습니다.'
-        //             })
-        //           }
-        //         }
-        //       })
-        //   }
-        // })
       },
     }
   }

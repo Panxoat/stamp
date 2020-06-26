@@ -269,13 +269,13 @@ components: {
         }
     }).then((response) => {
         let resTicket = response.data.ticket
-        // console.log(resTicket.length)
+        
         for(let i = 0; i<resTicket.length; i++) {
             if(resTicket[i] !== '') {
                 this.tickets.push(resTicket[i])
             }
         }
-        // console.log("tickets", this.tickets)
+        
     })
 
     axios.post('/ticket/status', {
@@ -288,7 +288,7 @@ components: {
                     this.reservations.push(statusTicket[i])
                 }
             }
-            // console.log("statusTicket", this.reservations)
+            
         })
     
  },
@@ -304,7 +304,7 @@ components: {
      
      buyTicket(ticketLink) {
          let getToken = localStorage.getItem('token')
-        //  console.log("tl", ticketLink)
+        
          axios.post('/ticket/purchase', {
              token: getToken,
              link: ticketLink
@@ -318,10 +318,10 @@ components: {
                 setTimeout(() => {
                     this.$router.go()
                 },1000)
-                // console.log(response)
+                
             })
             .catch((e) => {
-                // console.log(e.response.data)
+                
                 if(e.response.data.explain === 'Ticket Who') {
                     this.$swal({
                       icon: 'error',
@@ -367,7 +367,7 @@ components: {
                 }
             })
             .catch((e) => {
-                // console.log(e.response.data)
+                
                 alert("오류", e.response.data)
             })
      }
