@@ -29,14 +29,18 @@
         <v-toolbar-title v-else>잘못된 접근</v-toolbar-title>
         
         <v-spacer></v-spacer>
-        <v-dialog v-model="createDialog" max-width="500">
+        <v-dialog v-model="createDialog" max-width="800">
             <template v-slot:activator="{ on }">
-                <v-btn v-if="user['user_grade']==100" class="ma-4" color="indigo lighten-1" v-on="on">티켓 생성</v-btn>
+                <v-btn v-if="user['user_grade']==3" class="ma-4" color="indigo lighten-1" v-on="on">티켓 생성</v-btn>
             </template>
             <v-card>
+                <!-- 어드민 기능 -->
                 <v-card-title class="headline">티켓생성</v-card-title>
-                <v-divider></v-divider>
+                <v-img src="../assets/cat.svg" width="10%"></v-img>
+
                 <v-card-text>
+                    <v-row>
+                    <v-col md="6">
                     <ValidationObserver ref="observer" v-slot="{}">
                         <form>                       
                         <ValidationProvider v-slot="{ errors }" name="번호" rules="required">
@@ -92,16 +96,29 @@
                             required
                             outlined
                             ></v-text-field>
-                        </ValidationProvider>                        
-                        <div class="text-center">
-                            <v-btn class="subtitle-2 mx-2" color="indigo lighten-1" @click="postTicket" dark large>
-                                <v-icon dark>done_all</v-icon>
-                            </v-btn>                                      
-                        </div>                    
+                        </ValidationProvider>                                            
                         </form>   
-                    </ValidationObserver>                     
+                    </ValidationObserver>
+                    </v-col>
+
+                    <v-col>
+                        <v-color-picker class="ma-2" 
+                            show-swatches 
+                            v-model="color" 
+                            :mode.sync="mode"
+                            :value="color"
+                            hide-mode-switch></v-color-picker>
+                    </v-col>
+
+                    </v-row>
+                    <div class="text-center">
+                        <v-btn class="subtitle-2 mx-2" color="indigo lighten-1" @click="postTicket" dark large>
+                            <v-icon dark>done_all</v-icon>
+                        </v-btn>                                      
+                    </div>
                 </v-card-text>
-            </v-card>           
+                <!-- 어드민 기능 -->
+            </v-card>
         </v-dialog>
         <v-bottom-sheet v-model="sheet" max-width="60%">
             <template v-slot:activator="{ on, attrs}">
@@ -121,7 +138,7 @@
                             hide-default-footer
                             >
                             <template v-slot:item.cancelTicket="{ item }">
-                                <v-btn small color="indigo" dark @click="cancel(item.code)">취소</v-btn>
+                                <v-btn small color="indigo" dark @click="cancelTicket(item.code)">취소</v-btn>
                             </template>
                         </v-data-table>
                         <v-pagination v-model="page" :length="pageCount" color="indigo"></v-pagination>
@@ -204,9 +221,10 @@
                 <v-slide-group v-if="tickets != ''" show-arrows>
                     <v-slide-item v-for="(cdx, i) in tickets" :key="i">
                             <v-card class="ma-4" width="270">
+                                    <v-toolbar v-bind:color="ticketColor" dark flat>
+                                    <v-toolbar-title class="subheading font-weight-bold">{{cdx.title}}</v-toolbar-title>
+                                    </v-toolbar>                                
                                 <v-list dense>
-                                    <v-card-title class="subheading font-weight-bold">{{cdx.title}}</v-card-title>
-                                    <v-divider></v-divider>
                                     <v-list-item>
                                         <v-list-item-content class="font-weight-bold indigo--text text--lighten-1">티켓 번호</v-list-item-content>
                                         <v-list-item-content class="text-right">{{cdx.no}}</v-list-item-content>
@@ -288,6 +306,7 @@ components: {
         createDialog: false,
         infoDialog: false,
         tickets : [],
+        ticketColor: 'cyan',
         reservations: [],
         reservation: {
             ticketTitle : '',
@@ -310,6 +329,9 @@ components: {
             { text: '티켓이름', value: 'ticketname'},
             { text: '티켓취소', value: 'cancelTicket'}
         ],
+        mode: 'hexa',
+        type: 'hex',
+        color:'',
      }
  },
 
@@ -426,6 +448,7 @@ components: {
              open : this.postTicketOpen,
              close : this.postTicketClose,
              who : parseInt(this.postTicketWho),
+             color: this.color,
              token: getToken
          })
             .then((response) => {
@@ -438,7 +461,7 @@ components: {
             })
      },
      
-     cancel(code) {
+     cancelTicket(code) {
          console.log(code)
      }
  },
@@ -446,7 +469,7 @@ components: {
  computed: {
     ...mapState({
         user: state => state.auth.userInfo,
-    })
+    }),
  }
 }
 </script>
