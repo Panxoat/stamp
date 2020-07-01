@@ -6,7 +6,9 @@
         >
 
     <v-list dense>
-        <v-card-title class="subheading font-weight-bold">{{user['user_name']}}님이 신청한티켓</v-card-title>
+        <div v-if="user">
+            <v-card-title class="subheading font-weight-bold">{{user['user_name']}}님이 신청한티켓</v-card-title>
+        </div>            
         <v-divider></v-divider>
         <div>
             <v-card-text class="">신청내역 조회가 이동되었습니다.
@@ -29,9 +31,9 @@
         <v-toolbar-title v-else>잘못된 접근</v-toolbar-title>
         
         <v-spacer></v-spacer>
-        <v-dialog v-model="createDialog" max-width="800">
+        <v-dialog v-if="user" v-model="createDialog" max-width="800">
             <template v-slot:activator="{ on }">
-                <v-btn v-if="user['user_grade']==3" class="ma-4" color="indigo lighten-1" v-on="on">티켓 생성</v-btn>
+                <v-btn v-if="user['user_grade']==100" class="ma-4" color="indigo lighten-1" v-on="on">티켓 생성</v-btn>
             </template>
             <v-card>
                 <!-- 어드민 기능 -->
@@ -126,7 +128,7 @@
             </template>
             <v-sheet class="text-center" height="500px">
                 <v-card flat>
-                    <v-card-title class="font-weight-bold">
+                    <v-card-title class="font-weight-bold" v-if="user">
                         {{user['user_name']}}님 티켓 신청내역 ({{today}}기준)
                     </v-card-title>
                     <v-card-text>
@@ -138,7 +140,7 @@
                             hide-default-footer
                             >
                             <template v-slot:item.cancelTicket="{ item }">
-                                <v-btn small color="indigo" dark @click="cancelTicket(item.code)">취소</v-btn>
+                                <v-btn small color="indigo" dark @click="cancelTicket(item.link)">취소</v-btn>
                             </template>
                         </v-data-table>
                         <v-pagination v-model="page" :length="pageCount" color="indigo"></v-pagination>
@@ -221,8 +223,8 @@
                 <v-slide-group v-if="tickets != ''" show-arrows>
                     <v-slide-item v-for="(cdx, i) in tickets" :key="i">
                             <v-card class="ma-4" width="270">
-                                    <v-toolbar v-bind:color="ticketColor" dark flat>
-                                    <v-toolbar-title class="subheading font-weight-bold">{{cdx.title}}</v-toolbar-title>
+                                    <v-toolbar v-bind:color="cdx.color" dark flat>
+                                        <v-toolbar-title class="subheading font-weight-bold">{{cdx.title}}</v-toolbar-title>
                                     </v-toolbar>                                
                                 <v-list dense>
                                     <v-list-item>
@@ -250,7 +252,7 @@
                                         <v-list-item-content>{{cdx.close.split(' ')[1]}}</v-list-item-content>
                                     </v-list-item>                                                                        
                                 </v-list>
-                                <v-card-text>
+                                <v-card-text v-if="user">
                                     <v-dialog v-model="infoDialog" max-width="500">
                                         <template v-slot:activator="{ on }">
                                             <v-btn v-if="user['user_grade']==100" color="indigo lighten-1" @click="showTicket(cdx.link)" dark block v-on="on">조회하기</v-btn>
@@ -267,7 +269,9 @@
                                             </v-card-text>
                                         </v-card>
                                     </v-dialog>
-                                    <v-btn v-if="user['user_grade']!=100" color="indigo lighten-1" @click="buyTicket(cdx.link)" dark block>신청하기</v-btn>
+                                    <div v-if="user">
+                                        <v-btn v-if="user['user_grade']!=100" color="indigo lighten-1" @click="buyTicket(cdx.link)" dark block>신청하기</v-btn>
+                                    </div>
                                 </v-card-text>
                             </v-card>
                     </v-slide-item>
@@ -301,7 +305,7 @@ components: {
         snackbar: false,
         timeout: 3000,
         text: '여기로 이동되었습니다!',
-        drawer: null,
+        drawer: '',
         sheet: false,
         createDialog: false,
         infoDialog: false,
@@ -319,6 +323,7 @@ components: {
         postTicketClose: '',
         postTicketWho: '',
         ticketInfo: [],
+        today: '',
         headers: [
             {
                 text: '티켓번호',
@@ -348,6 +353,7 @@ components: {
         let resTicket = response.data.ticket
         
         for(let i = 0; i<resTicket.length; i++) {
+            console.log(resTicket)
             if(resTicket[i] !== '') {
                 this.tickets.push(resTicket[i])
             }
@@ -360,8 +366,8 @@ components: {
     })
         .then((response) => {
             let statusTicket = response.data.tickets
-            for(let i = 0; i<statusTicket.length; i++) {
-                if(statusTicket[i] !== '') {
+            if(statusTicket.length != 0) {
+                for(let i = 0; i<statusTicket.length; i++) {
                     this.reservations.push(statusTicket[i])
                     this.reservations[i].createdAt = 
                     `${this.reservations[i].createdAt.split(' ')[0].split('-')[0]}년
@@ -375,7 +381,6 @@ components: {
             let curdate = date.getDate()
             let curday = date.getDay()            
             this.today = `${curMonth+1}월 ${curdate}일 ${week[curday]}요일`
-            let created = this.reservations[0].createdAt
             this.pageCount = Math.ceil(this.reservations.length / this.itemsPerPage)
             
         })
@@ -410,7 +415,6 @@ components: {
                 
             })
             .catch((e) => {
-                
                 if(e.response.data.explain === 'Ticket Who') {
                     this.$swal({
                       icon: 'error',
@@ -423,6 +427,9 @@ components: {
                       title: '이런!',
                       text: '이미 신청한 티켓입니다'
                     })             
+                } else {
+                    alert("오류, 메인으로 이동합니다.")
+                    this.$router.push({name : 'login'})                    
                 }
             })
      },
@@ -453,17 +460,31 @@ components: {
          })
             .then((response) => {
                 if(response.data) {
-                    this.$router.go() // redirect
+                    console.log(response)
+                    // this.ticketColor = response.data.color
+                    // this.$router.go() // redirect
                 }
             })
             .catch((e) => {
-                alert("오류", e.response.data)
+                alert("오류", e)
             })
      },
      
-     cancelTicket(code) {
-         console.log(code)
-     }
+     cancelTicket(getLink) {
+         let getToken = localStorage.getItem('token')
+         axios.post('/ticket/cancel', {
+             token : getToken,
+             link : getLink
+         })
+            .then((response) => {
+                alert("성공적으로 삭제되었습니다.")
+                this.$router.go()
+            })
+            .catch((e) => {
+                alert("오류, 메인으로 이동합니다.")
+                this.$router.push({name : 'login'})
+            })
+     },
  },
 
  computed: {
