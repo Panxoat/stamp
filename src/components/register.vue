@@ -135,6 +135,7 @@
                         v-model="phone"
                         :error-messages="errors"
                         label="핸드폰 번호"
+                        :counter="11"
                         required
                         outlined
                         ></v-text-field>
@@ -161,10 +162,7 @@
         <v-footer padless absolute>
       <v-col
         class="py-2 text-center caption">
-벌점왕HS.com
- - SitSeeGSM.com 으로 자동 연결
-SitSeeGSM.com
- - CloudWatch NameServer를 통해 현재 AWS 서버 연결 예정
+스탬프.com - <a href='https://mo-hun.github.io/StampText/TermOfService'>이용약관</a> / <a href="https://mo-hun.github.io/StampText/PrivacyStatement">개인정보취급방침</a>
       </v-col>
     </v-footer>
   </v-app>
@@ -272,6 +270,7 @@ SitSeeGSM.com
               code: this.code
             })
               .then((response) => {
+                
                 if(response.data){
                   this.$swal({
                     icon: 'success',
@@ -283,6 +282,7 @@ SitSeeGSM.com
                 }
               })
               .catch((e) => {
+                
                 if(e.response) {
                   if(e.response.data.explain === 'Incorrect Code') {
                     this.$swal({
@@ -319,12 +319,24 @@ SitSeeGSM.com
             })
               .catch((e) => {
                 if(e.response) {
-                  // console.log(e.response.data)
-                  if(e.response.data.explain === 'joi error') {
+                  console.log(e.response.data)
+                  if(e.response.data.explain === 'Joi error') {
                     this.$swal({
                       icon: 'error',
                       title: '이런!',
-                      text: '이메일 인증을 하지 않으셨나요?'
+                      text: '인증 절차를 확인해주세요'
+                    })
+                  } else if(e.response.data.explain === 'fail Signup') {
+                    this.$swal({
+                      icon: 'error',
+                      title: '이런!',
+                      text: '서버 관리자에게 문의하세요'
+                    })
+                  }else if(e.response.data.explain === 'Incorrect Code') {
+                    this.$swal({
+                      icon: 'error',
+                      title: '이런!',
+                      text: '인증코드 확인을 해주세요'
                     })
                   }
                 }

@@ -10,7 +10,7 @@ Vue.use(VueRouter)
 
 const isAuthenticated = (to, from, next) => {
   if(store.state.auth.token === null) {
-    alert("로그인을 해주세요.")
+    alert("잘못된 접근입니다 로그인을 해주세요.")
     next('/login')
   } else {
     next()
@@ -19,7 +19,7 @@ const isAuthenticated = (to, from, next) => {
 
 const onlyAuthenticated = (to, from, next) => {
   if(store.state.auth.token !=undefined) {
-    alert("이미 로그인 되어있습니다.")
+    alert("잘못된 접근입니다 로그아웃을 해주세요.")
     next('/reserve')
   } else {
     next()
@@ -30,7 +30,8 @@ const routes = [
   {
     path:'/',
     name: 'main',
-    component: main
+    component: main,
+    beforeEnter: onlyAuthenticated
   },
   {
     path: '/reserve',

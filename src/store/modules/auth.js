@@ -17,6 +17,7 @@ const mutations = {
     },
     getUserInfo(state, payload) {
         state.userInfo = payload
+        
     },
     logout(state) {
         state.token = null
@@ -57,7 +58,7 @@ const actions = {
     },
     logout({commit}) {
         commit('logout')
-        router.push({name: "login"})
+        router.push({name: "main"})
     }
 }
 

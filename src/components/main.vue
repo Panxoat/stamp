@@ -11,7 +11,7 @@
         >
           <v-col md=3>
             <div class="font-weight-black display-2 indigo--text text--lighten-1 my-3" align="center">스탬프</div>
-            <div class="font-weight-black headline indigo--text text--lighten-1" align="center">기숙사 노트북 대여 시스템.beta</div>
+            <div class="font-weight-black headline indigo--text text--lighten-1" align="center">기숙사 노트북 대여 시스템</div>
                 <v-card-text>
                     <div class="my-4">
                         <v-btn x-large color="indigo lighten-1" dark block v-on:click="routePage('register')">회원가입</v-btn>
@@ -39,6 +39,9 @@ export default {
         return {
             
         }
+    },
+    created () {
+      localStorage.removeItem('token');
     },
 
     methods: {
